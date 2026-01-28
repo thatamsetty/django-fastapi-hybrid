@@ -1,8 +1,7 @@
+numpy<2
 Django==4.2
-django-ninja==0.22.0
-django-cors-headers==4.3.1
-whitenoise==6.6.0
 mongoengine==0.29.1
+django-ninja==0.22.0
 PyJWT==2.8.0
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.6
