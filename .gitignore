@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Django generated
+staticfiles/
+
+# Datasets & outputs
+Datasets/
+output_annotated_images/
+
+# Nested copy safety
+django-fastapi-hybrid/
+
+# OS
+desktop.ini
