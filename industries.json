@@ -1,0 +1,34 @@
+{
+  "industries": [
+    {
+      "id": "IND01",
+      "name": "Smart City Monitoring",
+      "img": "https://res.cloudinary.com/dateiqugp/image/upload/v1769151990/Smart_City_Living.jpg_jzjffv.jpg"
+    },
+    {
+      "id": "IND02",
+      "name": "Logistic and Warehouse",
+      "img": "https://res.cloudinary.com/dateiqugp/image/upload/v1769151983/Logistics_and_Warehousing.jpg_ndiy0f.jpg"
+    },
+    {
+      "id": "IND03",
+      "name": "Mining and Cementery",
+      "img": "https://res.cloudinary.com/dateiqugp/image/upload/v1769151984/Mining_and_Cementry.jpg_xrpd53.jpg"
+    },
+    {
+      "id": "IND04",
+      "name": "Energy and Utilities",
+      "img": "https://res.cloudinary.com/dateiqugp/image/upload/v1769151982/Energy_and_Utilities.jpg_r5pkum.jpg"
+    },
+    {
+      "id": "IND05",
+      "name": "Surveillance and Security",
+      "img": "https://res.cloudinary.com/dateiqugp/image/upload/v1769151983/Security_and_Surveillance.jpg_tdnqld.jpg"
+    },
+    {
+      "id": "IND06",
+      "name": "Forest and Environment",
+      "img": "https://res.cloudinary.com/dateiqugp/image/upload/v1769151983/Forest_and_Environment.jpg_l8twca.jpg"
+    }
+  ]
+}

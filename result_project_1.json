@@ -1,0 +1,293 @@
+{
+  "project_id": "project_1",
+  "images": [
+    {
+      "id": 1,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252007/qqrue7vdheoirdvx4kwf.jpg",
+      "cardTitle": "Detection Result #1",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "52"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "elephant"
+        }
+      ],
+      "_raw": {
+        "count": 52,
+        "classes": [
+          "elephant"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252011/ncjgz8pppmsp36txz23s.jpg",
+      "cardTitle": "Detection Result #2",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "4"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "elephant"
+        }
+      ],
+      "_raw": {
+        "count": 4,
+        "classes": [
+          "elephant"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252019/eucw7cfrktirzpmbfasa.jpg",
+      "cardTitle": "Detection Result #3",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "11"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "elephant"
+        }
+      ],
+      "_raw": {
+        "count": 11,
+        "classes": [
+          "elephant"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252030/mlwftqb9epljzfsgmzzi.jpg",
+      "cardTitle": "Detection Result #4",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "2"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "lioness, lion"
+        }
+      ],
+      "_raw": {
+        "count": 2,
+        "classes": [
+          "lioness",
+          "lion"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252040/jnkjrwwej7uoarymhrlm.jpg",
+      "cardTitle": "Detection Result #5",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "2"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "lion, lioness"
+        }
+      ],
+      "_raw": {
+        "count": 2,
+        "classes": [
+          "lion",
+          "lioness"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252046/hpoiohsi6d1bncotpv2i.jpg",
+      "cardTitle": "Detection Result #6",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "28"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Deer"
+        }
+      ],
+      "_raw": {
+        "count": 28,
+        "classes": [
+          "Deer"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252053/myudynqojydisefuainw.jpg",
+      "cardTitle": "Detection Result #7",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "29"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Deer"
+        }
+      ],
+      "_raw": {
+        "count": 29,
+        "classes": [
+          "Deer"
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252058/odknyr4tggig4kxpaapl.jpg",
+      "cardTitle": "Detection Result #8",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "9"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "giraffe"
+        }
+      ],
+      "_raw": {
+        "count": 9,
+        "classes": [
+          "giraffe"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252064/rugza1k3ovcjlczctckn.jpg",
+      "cardTitle": "Detection Result #9",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "8"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "giraffe"
+        }
+      ],
+      "_raw": {
+        "count": 8,
+        "classes": [
+          "giraffe"
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252068/ud95g6kraxehsnwryi8o.jpg",
+      "cardTitle": "Detection Result #10",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "18"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Zebra"
+        }
+      ],
+      "_raw": {
+        "count": 18,
+        "classes": [
+          "Zebra"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769252072/pyrxsicqp7bwtvmiemec.jpg",
+      "cardTitle": "Detection Result #11",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "30"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Zebra"
+        }
+      ],
+      "_raw": {
+        "count": 30,
+        "classes": [
+          "Zebra"
+        ]
+      }
+    }
+  ]
+}

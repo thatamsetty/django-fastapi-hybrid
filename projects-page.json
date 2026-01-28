@@ -1,0 +1,36 @@
+[{
+  "id": "project_1",
+  "name": "Counting of Animals",
+  "industryType": "Wildlife and Environment",
+  "deliverables": "Animal Counting + Detection",
+  "location": "Mysuru, Karnataka",
+  "status": "Completed",
+  "progress": 100,
+  "startDate": "2026-01-22",
+  "team": 11,
+  "priority": "high"
+},
+{
+  "id": "project_2",
+  "name": "Mining Vehicles",
+  "industryType": "Mining",
+  "deliverables": "Vehicle Detection + Counting",
+  "location": "Visakhapatnam, Andhra Pradesh",
+  "status": "Completed",
+  "progress": 100,
+  "startDate": "2026-01-22",
+  "team": 11,
+  "priority": "high"
+},
+{
+  "id": "project_3",
+  "name": "Vehicle Detection",
+  "industryType": "Smart City Living",
+  "deliverables": "Vehicle Detection + Analytics",
+  "location": "Pune, Maharashtra",
+  "status": "Completed",
+  "progress": 100,
+  "startDate": "2026-01-22",
+  "team": 11,
+  "priority": "high"
+}]

@@ -1,0 +1,105 @@
+{
+  "project_id": "project_2",
+  "images": [
+    {
+      "id": 101,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145165/s4bcv1cqjfuvajuadqau.jpg",
+      "cardTitle": "Detection: project_2",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "1"
+        },
+        {
+          "label": "Categories",
+          "value": "Proclainer"
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145166/iju1gm60bqxvvmblysvf.jpg",
+      "cardTitle": "Detection: project_2",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "2"
+        },
+        {
+          "label": "Categories",
+          "value": "Proclainer, Truck"
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145167/gz7xxljwdof2jmyoxgze.jpg",
+      "cardTitle": "Detection: project_2",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "1"
+        },
+        {
+          "label": "Categories",
+          "value": "Proclainer"
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145168/cnuj0eiitnry4is12ss2.jpg",
+      "cardTitle": "Detection: project_2",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "2"
+        },
+        {
+          "label": "Categories",
+          "value": "Truck"
+        }
+      ]
+    },
+    {
+      "id": 105,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145169/wifvqtzkua0lcveiecwl.jpg",
+      "cardTitle": "Detection: project_2",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "1"
+        },
+        {
+          "label": "Categories",
+          "value": "Truck"
+        }
+      ]
+    }
+  ]
+}

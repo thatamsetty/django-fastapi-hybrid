@@ -1,0 +1,49 @@
+/* Fix for Swagger UI method badges displaying vertically */
+.swagger-ui .opblock .opblock-summary-method {
+    display: inline-block !important;
+    margin-right: 10px !important;
+    vertical-align: top !important;
+}
+
+.swagger-ui .opblock .opblock-summary-path {
+    display: inline-block !important;
+    vertical-align: top !important;
+}
+
+.swagger-ui .opblock-summary {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Ensure method badges are properly styled */
+.swagger-ui .opblock .opblock-summary-method {
+    background: #50b8e7 !important;
+    color: white !important;
+    border-radius: 3px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    min-width: 60px !important;
+    text-align: center !important;
+}
+
+/* GET method */
+.swagger-ui .opblock-get .opblock-summary-method {
+    background: #61affe !important;
+}
+
+/* POST method */
+.swagger-ui .opblock-post .opblock-summary-method {
+    background: #49cc90 !important;
+}
+
+/* PUT method */
+.swagger-ui .opblock-put .opblock-summary-method {
+    background: #fca130 !important;
+}
+
+/* DELETE method */
+.swagger-ui .opblock-delete .opblock-summary-method {
+    background: #f93e3e !important;
+}

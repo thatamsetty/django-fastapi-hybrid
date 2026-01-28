@@ -1,0 +1,276 @@
+{
+  "barData": {
+    "labels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "values": [
+      21,
+      5,
+      12,
+      9,
+      7,
+      12,
+      27
+    ]
+  },
+  "lineData": {
+    "labels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "values": [
+      21,
+      5,
+      12,
+      9,
+      7,
+      12,
+      27
+    ]
+  },
+  "areaData": {
+    "labels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "values": [
+      21,
+      26,
+      38,
+      47,
+      54,
+      66,
+      93
+    ]
+  },
+  "pieData": {
+    "labels": [
+      "Truck",
+      "Car",
+      "Van",
+      "Proclainer"
+    ],
+    "values": [
+      81,
+      93,
+      69,
+      12
+    ]
+  },
+  "gallery": [
+    {
+      "id": 1,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769251960/e8dei1fsqwmyvp641t0m.jpg",
+      "cardTitle": "Detection Result #1",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "21"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Truck, Car, Van"
+        }
+      ],
+      "_raw": {
+        "count": 21,
+        "classes": [
+          "Truck",
+          "Car",
+          "Van"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769251961/v1sh2nak2qwlqhbxnxul.jpg",
+      "cardTitle": "Detection Result #2",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "5"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Car"
+        }
+      ],
+      "_raw": {
+        "count": 5,
+        "classes": [
+          "Car"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769251961/tp6q0id1rhkalfcphasw.jpg",
+      "cardTitle": "Detection Result #3",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "12"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Truck, Proclainer, Car, Van"
+        }
+      ],
+      "_raw": {
+        "count": 12,
+        "classes": [
+          "Truck",
+          "Proclainer",
+          "Car",
+          "Van"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769251962/l4z5yrounpmwpuvsbzzo.jpg",
+      "cardTitle": "Detection Result #4",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "9"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Truck, Car, Van"
+        }
+      ],
+      "_raw": {
+        "count": 9,
+        "classes": [
+          "Truck",
+          "Car",
+          "Van"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769251963/cublzq6dmee9hnud8uit.jpg",
+      "cardTitle": "Detection Result #5",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "7"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Car"
+        }
+      ],
+      "_raw": {
+        "count": 7,
+        "classes": [
+          "Car"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769251964/ftikqnchwzj5pfc62fsr.jpg",
+      "cardTitle": "Detection Result #6",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "12"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Truck, Car"
+        }
+      ],
+      "_raw": {
+        "count": 12,
+        "classes": [
+          "Truck",
+          "Car"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769251964/bewaiwao2c7uo0jqra6j.jpg",
+      "cardTitle": "Detection Result #7",
+      "sectionTitle": "Object Statistics",
+      "meta": {
+        "date": "2026-01-24",
+        "location": "Processing Lab"
+      },
+      "metrics": [
+        {
+          "label": "Total Objects",
+          "value": "27"
+        },
+        {
+          "label": "Detected Classes",
+          "value": "Truck, Car, Van"
+        }
+      ],
+      "_raw": {
+        "count": 27,
+        "classes": [
+          "Truck",
+          "Car",
+          "Van"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "project_id": "project_3",
+    "total_images": 7,
+    "total_detections": 93,
+    "generated_on": "2026-01-24"
+  }
+}

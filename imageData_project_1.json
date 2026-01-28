@@ -1,0 +1,225 @@
+{
+  "project_id": "project_1",
+  "images": [
+    {
+      "id": 101,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145564/steot7jakv7aj15gqdkk.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "52"
+        },
+        {
+          "label": "Categories",
+          "value": "elephant"
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145567/btdlnxjn5e1ncoawtuho.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "4"
+        },
+        {
+          "label": "Categories",
+          "value": "elephant"
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145573/p6mmqtblmwxrjbgnofkm.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "11"
+        },
+        {
+          "label": "Categories",
+          "value": "elephant"
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145581/kgafujtw5kntc4qzhri8.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "2"
+        },
+        {
+          "label": "Categories",
+          "value": "lion, lioness"
+        }
+      ]
+    },
+    {
+      "id": 105,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145590/ixzor5ayhbead4uaqlvj.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "2"
+        },
+        {
+          "label": "Categories",
+          "value": "lion, lioness"
+        }
+      ]
+    },
+    {
+      "id": 106,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145595/nems7hnulh5b6udoaww9.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "28"
+        },
+        {
+          "label": "Categories",
+          "value": "Deer"
+        }
+      ]
+    },
+    {
+      "id": 107,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145600/efed51qyo5clbqscuicx.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "29"
+        },
+        {
+          "label": "Categories",
+          "value": "Deer"
+        }
+      ]
+    },
+    {
+      "id": 108,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145605/ir7y3ckbnviv2thritxp.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "9"
+        },
+        {
+          "label": "Categories",
+          "value": "giraffe"
+        }
+      ]
+    },
+    {
+      "id": 109,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145610/trpxmoa2roqlt1y9xycp.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "8"
+        },
+        {
+          "label": "Categories",
+          "value": "giraffe"
+        }
+      ]
+    },
+    {
+      "id": 110,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145615/kxwhogd6mrnwr0bzajjk.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "18"
+        },
+        {
+          "label": "Categories",
+          "value": "Zebra"
+        }
+      ]
+    },
+    {
+      "id": 111,
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769145620/t69nu1q1e25hkhy3kmvj.jpg",
+      "cardTitle": "Detection: project_1",
+      "meta": {
+        "date": "2026-01-23",
+        "location": "Analysis Lab"
+      },
+      "sectionTitle": "Object Statistics",
+      "metrics": [
+        {
+          "label": "Total Count",
+          "value": "30"
+        },
+        {
+          "label": "Categories",
+          "value": "Zebra"
+        }
+      ]
+    }
+  ]
+}
