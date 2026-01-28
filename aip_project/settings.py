@@ -1,117 +1,132 @@
 from pathlib import Path
+import os
 import mongoengine
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'aip-django-fastapi-mongodb-secure-key-2026-!@#$%^&*()'
+# =========================
+# SECURITY
+# =========================
+SECRET_KEY = os.getenv(
+    "DJANGO_SECRET_KEY",
+    "aip-django-fastapi-mongodb-secure-key-2026"
+)
+
 DEBUG = False
-ALLOWED_HOSTS = ['*']
 
+ALLOWED_HOSTS = ["*"]
+
+# =========================
+# APPLICATIONS
+# =========================
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
-    'corsheaders',
-    'ninja',
-    'mongoengine',
+    "corsheaders",
+    "ninja",
 
-    'auth_app',
-    'processing_app',
+    "auth_app",
+    "processing_app",
 ]
 
+# =========================
+# MIDDLEWARE
+# =========================
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
 
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # ✅ REQUIRED
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
     "ninja.compatibility.files.fix_request_files_middleware",
 ]
 
-
-
-
+# =========================
+# CORS
+# =========================
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "authorization",
-    "content-type",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
+# =========================
+# URL / ASGI / WSGI
+# =========================
+ROOT_URLCONF = "aip_project.urls"
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+WSGI_APPLICATION = "aip_project.wsgi.application"
+ASGI_APPLICATION = "aip_project.asgi.application"
 
-ROOT_URLCONF = 'aip_project.urls'
-
+# =========================
+# TEMPLATES
+# =========================
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'aip_project.wsgi.application'
-ASGI_APPLICATION = 'aip_project.asgi.application'
-
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+# =========================
+# INTERNATIONALIZATION
+# =========================
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
 # =========================
-# STATIC FILES CONFIG
+# STATIC FILES (RENDER)
 # =========================
-
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = (
+    "whitenoise.storage.CompressedManifestStaticFilesStorage"
+)
 
-# where your project static files live (DEV)
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
-
-SECRET_KEY_JWT = 'akin-777'
-
-NINJA_PAGINATION_CLASS = 'ninja.pagination.PageNumberPagination'
+# =========================
+# DJANGO-NINJA
+# =========================
+NINJA_PAGINATION_CLASS = "ninja.pagination.PageNumberPagination"
 NINJA_PAGINATION_PER_PAGE = 100
 NINJA_MAX_PER_PAGE_SIZE = 1000
-NINJA_PAGINATION_MAX_LIMIT = 10000
-NINJA_NUM_PROXIES = 1
-NINJA_DEFAULT_THROTTLE_RATES = {}
-NINJA_FIX_REQUEST_FILES_METHODS = ['POST', 'PUT', 'PATCH']
 
-mongoengine.connect(
-    db='aip_database',
-    host='localhost',
-    port=27017,
-    username='',
-    password='',
-    authentication_source='admin'
-)
+# =========================
+# JWT
+# =========================
+SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT", "akin-777")
+
+# =========================
+# MONGODB (ATLAS / LOCAL)
+# =========================
+MONGO_URI = os.getenv("MONGO_URI")
+
+if MONGO_URI:
+    mongoengine.connect(host=MONGO_URI)
+else:
+    # Local development fallback
+    mongoengine.connect(
+        db="aip_database",
+        host="localhost",
+        port=27017,
+    )
