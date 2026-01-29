@@ -1,12 +1,11 @@
 from ninja import Router, Schema, File
 from ninja.files import UploadedFile
 from datetime import date
-import os, cv2, yaml, json, natsort, threading
+import os, cv2, yaml, json, natsort, threading, traceback
 import cloudinary
 import cloudinary.uploader
 from django.conf import settings
 from django.db import close_old_connections
-from django.utils import timezone
 
 from .models import ProjectStatus
 from auth_app.otp_service import send_download_link_email, send_rejection_email
@@ -64,10 +63,18 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def safe_load_json(path, default):
     try:
         if os.path.exists(path):
-            return json.load(open(path))
+            with open(path, "r") as f:
+                return json.load(f)
     except:
         pass
     return default
+
+# =====================================================
+# SAFE JSON WRITER
+# =====================================================
+def safe_write_json(path, data):
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
 
 # =====================================================
 # ANALYTICS GENERATOR
@@ -105,7 +112,7 @@ def update_analytics_data(final_data: dict, project_id: str):
     }
 
     path = os.path.join(settings.BASE_DIR, f"analytics_{project_id}.json")
-    json.dump(analytics, open(path, "w"), indent=2)
+    safe_write_json(path, analytics)
 
 # =====================================================
 # MAIN PIPELINE
@@ -113,10 +120,8 @@ def update_analytics_data(final_data: dict, project_id: str):
 def run_pipeline(project_id: str, dataset_path: str):
     close_old_connections()
 
-    # deactivate all
     ProjectStatus.objects.all().update(active=False, running=False)
 
-    # SAFE UPSERT
     status, _ = ProjectStatus.objects.update_or_create(
         project_id=project_id,
         defaults={"active": True, "running": True, "completed": False}
@@ -127,7 +132,9 @@ def run_pipeline(project_id: str, dataset_path: str):
         if not os.path.exists(yaml_path):
             raise Exception(f"Missing data.yaml in {dataset_path}")
 
-        data = yaml.safe_load(open(yaml_path))
+        with open(yaml_path, "r") as f:
+            data = yaml.safe_load(f)
+
         class_names = data["names"]
 
         images_dir = os.path.join(dataset_path, "train", "images")
@@ -154,29 +161,41 @@ def run_pipeline(project_id: str, dataset_path: str):
             classes = set()
 
             if os.path.exists(label_path):
-                for line in open(label_path):
-                    cls, x, y, bw, bh = map(float, line.split())
-                    label = class_names[int(cls)]
-                    count += 1
-                    classes.add(label)
+                with open(label_path, "r") as lf:
+                    for line in lf:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        parts = line.split()
+                        if len(parts) != 5:
+                            continue
 
-                    x1 = int((x - bw / 2) * w)
-                    y1 = int((y - bh / 2) * h)
-                    x2 = int((x + bw / 2) * w)
-                    y2 = int((y + bh / 2) * h)
+                        cls, x, y, bw, bh = map(float, parts)
+                        label = class_names[int(cls)]
+                        count += 1
+                        classes.add(label)
 
-                    cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
-                    cv2.putText(img, label, (x1, max(20, y1 - 5)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                        x1 = int((x - bw / 2) * w)
+                        y1 = int((y - bh / 2) * h)
+                        x2 = int((x + bw / 2) * w)
+                        y2 = int((y + bh / 2) * h)
+
+                        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                        cv2.putText(img, label, (x1, max(20, y1 - 5)),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
             out_path = os.path.join(OUTPUT_DIR, f"{project_id}_{img_name}")
             cv2.imwrite(out_path, img)
 
-            upload = cloudinary.uploader.upload(out_path)
+            try:
+                upload = cloudinary.uploader.upload(out_path)
+                image_url = upload["secure_url"]
+            except:
+                image_url = ""
 
             final_data["images"].append({
                 "id": idx,
-                "mainImage": upload["secure_url"],
+                "mainImage": image_url,
                 "metrics": [
                     {"label": "Total Objects", "value": str(count)},
                     {"label": "Detected Classes", "value": ", ".join(classes) if classes else "None"}
@@ -184,13 +203,16 @@ def run_pipeline(project_id: str, dataset_path: str):
                 "_raw": {"count": count, "classes": list(classes)}
             })
 
-        json.dump(final_data, open(os.path.join(settings.BASE_DIR, f"result_{project_id}.json"), "w"), indent=2)
+        safe_write_json(os.path.join(settings.BASE_DIR, f"result_{project_id}.json"), final_data)
         update_analytics_data(final_data, project_id)
 
         status.completed = True
 
     except Exception as e:
-        json.dump({"error": str(e)}, open(os.path.join(settings.BASE_DIR, f"result_{project_id}.json"), "w"))
+        safe_write_json(
+            os.path.join(settings.BASE_DIR, f"result_{project_id}.json"),
+            {"error": str(e), "trace": traceback.format_exc()}
+        )
 
     finally:
         status.running = False
@@ -198,9 +220,9 @@ def run_pipeline(project_id: str, dataset_path: str):
         status.save()
 
 # =====================================================
-# API ROUTES
+# PROJECT PROCESSING APIs
 # =====================================================
-@processing_router.post("/start-processing", tags=["PROJECT PROCESSING API'S"])
+@processing_router.post("/start-processing", tags=["Project Processing"])
 def start_processing(request, data: StartProcessRequest):
     dataset_path = PROJECT_PATH_MAP.get(data.project_id)
     if not dataset_path:
@@ -212,7 +234,7 @@ def start_processing(request, data: StartProcessRequest):
     threading.Thread(target=run_pipeline, args=(data.project_id, dataset_path), daemon=True).start()
     return {"message": f"Processing started for {data.project_id}"}
 
-@processing_router.get("/get-result", response={200: dict}, tags=["PROJECT PROCESSING API'S"])
+@processing_router.get("/get-result", tags=["Project Processing"])
 def get_result(request):
     status = ProjectStatus.objects.filter(active=True).first()
     if not status:
@@ -224,7 +246,7 @@ def get_result(request):
     path = os.path.join(settings.BASE_DIR, f"result_{status.project_id}.json")
     return safe_load_json(path, {"processing": False, "images": []})
 
-@processing_router.get("/get-analytics", response={200: dict}, tags=["PROJECT PROCESSING API'S"])
+@processing_router.get("/get-analytics", tags=["Project Processing"])
 def get_analytics(request):
     status = ProjectStatus.objects.filter(active=True).first()
     if not status:
@@ -234,15 +256,15 @@ def get_analytics(request):
     return safe_load_json(path, {})
 
 # =====================================================
-# FILE UPLOAD & REJECT
+# FILE UPLOAD & REJECT APIs
 # =====================================================
-@processing_router.post("/upload-file", tags=["FILE UPLOAD,REJECT API"])
+@processing_router.post("/upload-file", tags=["File Management"])
 def upload_file(request, file: UploadedFile = File(...)):
     upload = cloudinary.uploader.upload(file.file, resource_type="raw")
     send_download_link_email(upload["secure_url"])
     return {"status": "success", "download_link": upload["secure_url"]}
 
-@processing_router.post("/reject-image", tags=["FILE UPLOAD,REJECT API"])
+@processing_router.post("/reject-image", tags=["File Management"])
 def reject_image(request, data: RejectionRequest):
     send_rejection_email(data.image_id, data.image_url)
     return {"status": "success"}
@@ -250,26 +272,26 @@ def reject_image(request, data: RejectionRequest):
 # =====================================================
 # STATIC JSON APIs
 # =====================================================
-@processing_router.get("/get-alerts")
-def get_alerts(request): return _load_json(ALERTS_FILE)
+@processing_router.get("/get-alerts", tags=["Dashboard Data"])
+def get_alerts(request): return safe_load_json(ALERTS_FILE, [])
 
-@processing_router.get("/get-projects")
-def get_projects(request): return _load_json(PROJECTS_FILE)
+@processing_router.get("/get-projects", tags=["Dashboard Data"])
+def get_projects(request): return safe_load_json(PROJECTS_FILE, [])
 
-@processing_router.get("/user-management")
-def user_management(request): return _load_json(USER_MANAGEMENT)
+@processing_router.get("/user-management", tags=["Dashboard Data"])
+def user_management(request): return safe_load_json(USER_MANAGEMENT, {})
 
-@processing_router.get("/admin-management")
-def admin_management(request): return _load_json(ADMIN_MANAGEMENT)
+@processing_router.get("/admin-management", tags=["Dashboard Data"])
+def admin_management(request): return safe_load_json(ADMIN_MANAGEMENT, {})
 
-@processing_router.get("/dashboard-data")
-def dashboard_data(request): return _load_json(DASHBOARD_DATA)
+@processing_router.get("/dashboard-data", tags=["Dashboard Data"])
+def dashboard_data(request): return safe_load_json(DASHBOARD_DATA, {})
 
-@processing_router.get("/client-data")
-def client_data(request): return _load_json(CLIENT_DATA)
+@processing_router.get("/client-data", tags=["Dashboard Data"])
+def client_data(request): return safe_load_json(CLIENT_DATA, [])
 
-@processing_router.get("/industries")
-def industries(request): return _load_json(INDUSTRIES)
+@processing_router.get("/industries", tags=["Dashboard Data"])
+def industries(request): return safe_load_json(INDUSTRIES, [])
 
-@processing_router.get("/recent-projects")
-def recent_projects(request): return _load_json(RECENT_PROJECTS)
+@processing_router.get("/recent-projects", tags=["Dashboard Data"])
+def recent_projects(request): return safe_load_json(RECENT_PROJECTS, [])
