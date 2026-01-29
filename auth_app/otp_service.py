@@ -1,20 +1,20 @@
 import os
 import random
 import smtplib
+import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import ssl
 
 
 # =========================
-# MAIL CONFIG (FROM ENV)
+# MAIL CONFIG (FROM RENDER ENV)
 # =========================
 class MailConfig:
-    SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp-relay.brevo.com")
-    SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-    SMTP_USER = os.getenv("SMTP_USER", "apikey")   # Brevo requires literal "apikey"
-    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")     # Your Brevo API key
-    SENDER_EMAIL = os.getenv("SENDER_EMAIL")       # Verified sender email in Brevo
+    SMTP_SERVER = os.getenv("SMTP_SERVER")           # smtp-relay.brevo.com
+    SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))   # 587
+    SMTP_USER = os.getenv("SMTP_USER")               # apikey
+    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")       # YOUR_BREVO_API_KEY
+    SENDER_EMAIL = os.getenv("SENDER_EMAIL")         # your verified sender
 
 
 # =========================
@@ -29,14 +29,13 @@ def generate_otp() -> str:
 # =========================
 def _send_email(to_email: str, subject: str, body: str):
 
-    # Safety check
     if not all([
         MailConfig.SMTP_SERVER,
         MailConfig.SMTP_PASSWORD,
         MailConfig.SENDER_EMAIL,
         MailConfig.SMTP_USER,
     ]):
-        raise Exception("❌ Email environment variables are not properly configured in Render!")
+        raise Exception("❌ Email environment variables are not configured!")
 
     message = MIMEMultipart()
     message["From"] = MailConfig.SENDER_EMAIL
@@ -47,25 +46,16 @@ def _send_email(to_email: str, subject: str, body: str):
 
     context = ssl.create_default_context()
 
-    try:
-        with smtplib.SMTP(MailConfig.SMTP_SERVER, MailConfig.SMTP_PORT) as server:
-            server.starttls(context=context)
-            server.login(MailConfig.SMTP_USER, MailConfig.SMTP_PASSWORD)
-            server.send_message(message)
-
-    except Exception as e:
-        print("❌ EMAIL SENDING FAILED:", str(e))
-        raise e
+    with smtplib.SMTP(MailConfig.SMTP_SERVER, MailConfig.SMTP_PORT) as server:
+        server.starttls(context=context)
+        server.login(MailConfig.SMTP_USER, MailConfig.SMTP_PASSWORD)
+        server.send_message(message)
 
 
 # =========================
 # SEND OTP EMAIL
 # =========================
 def send_otp_email(to_email: str, otp: str | None = None):
-
-    if not to_email:
-        raise Exception("Recipient email is required")
-
     if not otp:
         otp = generate_otp()
 
@@ -88,7 +78,6 @@ If you did not request this, please ignore this email.
 # SEND DOWNLOAD LINK EMAIL
 # =========================
 def send_download_link_email(to_email: str, download_link: str):
-
     subject = "Your Download Link Is Ready"
     body = f"""
 Hello,
@@ -100,7 +89,6 @@ Click here to download:
 
 Thank you.
 """
-
     _send_email(to_email, subject, body)
     return True
 
@@ -109,7 +97,6 @@ Thank you.
 # SEND REJECTION EMAIL
 # =========================
 def send_rejection_email(to_email: str, reason: str = "Your request was rejected"):
-
     subject = "Request Rejected"
     body = f"""
 Hello,
@@ -121,6 +108,5 @@ Reason:
 
 Please contact support if you think this is a mistake.
 """
-
     _send_email(to_email, subject, body)
     return True

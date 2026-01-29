@@ -66,10 +66,11 @@ def login(request, data: LoginRequest):
     otp = generate_otp()
     save_otp(username, otp)
 
-    # ✅ ALWAYS send OTP to MailConfig.OTP_RECIPIENT (thrinethra098@gmail.com)
-    send_otp_email(otp=otp)
+    # ✅ Send OTP to user's email
+    send_otp_email(to_email=user["email"], otp=otp)
 
     return {"message": "OTP sent successfully"}
+
 
 
 # =========================
