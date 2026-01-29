@@ -1,3 +1,4 @@
+import os
 import random
 import smtplib
 from email.mime.text import MIMEText
@@ -6,15 +7,14 @@ import ssl
 
 
 # =========================
-# MAIL CONFIG
+# MAIL CONFIG (FROM ENV)
 # =========================
 class MailConfig:
-    SENDER_EMAIL = "keerthanaakula04@gmail.com"
-    SENDER_PASSWORD = "gtjwqrxwvupjeqzy"  # move to env later
-    OTP_RECIPIENT = "thrinethra098@gmail.com"
-
-    SMTP_SERVER = "smtp.gmail.com"
-    SMTP_PORT = 465  # SSL
+    SMTP_SERVER = os.getenv("SMTP_SERVER")        # smtp-relay.brevo.com
+    SMTP_PORT = int(os.getenv("SMTP_PORT", "587")) # 587
+    SMTP_USER = os.getenv("SMTP_USER")            # apikey
+    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")    # YOUR_BREVO_API_KEY
+    SENDER_EMAIL = os.getenv("SENDER_EMAIL")      # your email
 
 
 # =========================
@@ -28,6 +28,14 @@ def generate_otp() -> str:
 # CORE SEND EMAIL
 # =========================
 def _send_email(to_email: str, subject: str, body: str):
+
+    if not all([
+        MailConfig.SMTP_SERVER,
+        MailConfig.SMTP_PASSWORD,
+        MailConfig.SENDER_EMAIL
+    ]):
+        raise Exception("Email environment variables are not configured!")
+
     message = MIMEMultipart()
     message["From"] = MailConfig.SENDER_EMAIL
     message["To"] = to_email
@@ -37,27 +45,18 @@ def _send_email(to_email: str, subject: str, body: str):
 
     context = ssl.create_default_context()
 
-    with smtplib.SMTP_SSL(
-        MailConfig.SMTP_SERVER,
-        MailConfig.SMTP_PORT,
-        context=context
-    ) as server:
-        server.login(
-            MailConfig.SENDER_EMAIL,
-            MailConfig.SENDER_PASSWORD
-        )
+    with smtplib.SMTP(MailConfig.SMTP_SERVER, MailConfig.SMTP_PORT) as server:
+        server.starttls(context=context)
+        server.login(MailConfig.SMTP_USER, MailConfig.SMTP_PASSWORD)
         server.send_message(message)
 
 
 # =========================
 # SEND OTP EMAIL
 # =========================
-def send_otp_email(to_email: str | None = None, otp: str | None = None):
+def send_otp_email(to_email: str, otp: str | None = None):
     if not otp:
         otp = generate_otp()
-
-    if not to_email:
-        to_email = MailConfig.OTP_RECIPIENT
 
     subject = "Your OTP Code"
     body = f"""
