@@ -2,12 +2,14 @@ from datetime import datetime, timedelta
 
 OTP_MEMORY = {}
 
+
 def save_otp(username: str, otp: str):
     OTP_MEMORY[username] = {
         "otp": otp,
         "expires_at": datetime.utcnow() + timedelta(minutes=10),
-        "verified": False
+        "verified": False,
     }
+
 
 def verify_otp(username: str, otp: str):
     record = OTP_MEMORY.get(username)
@@ -24,6 +26,6 @@ def verify_otp(username: str, otp: str):
     record["verified"] = True
     return True, "OTP verified"
 
+
 def is_verified(username: str):
-    record = OTP_MEMORY.get(username)
-    return record and record["verified"]
+    return OTP_MEMORY.get(username, {}).get("verified", False)

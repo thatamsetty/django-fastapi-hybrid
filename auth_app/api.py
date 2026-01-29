@@ -23,7 +23,6 @@ class TokenResponse(Schema):
 class LoginRequest(Schema):
     username: str
     password: str
-    required_role: str | None = None
 
 
 class OTPVerifyRequest(Schema):
@@ -31,53 +30,66 @@ class OTPVerifyRequest(Schema):
     otp: str
 
 
+# =========================
+# FAKE USERS DB
+# =========================
 USERS_DB = {
-    "super_root": {
-        "password": "super123",
-        "role": "superadmin",
-        "email": "superadmin@test.com"
-    },
     "admin": {
         "password": "admin123",
         "role": "admin",
-        "email": "admin@test.com"
+        "email": "admin@test.com",
     },
-    "user_01": {
+    "user": {
         "password": "user123",
         "role": "user",
-        "email": "user@test.com"
+        "email": "user@test.com",
+    },
+    "super_root": {
+        "password": "super123",
+        "role": "superadmin",
+        "email": "superroot@test.com",
     },
 }
 
 
+# =========================
+# LOGIN
+# =========================
 @auth_router.post("/login", response={200: MessageResponse, 401: MessageResponse})
 def login(request, data: LoginRequest):
     username = data.username.lower()
-
     user = USERS_DB.get(username)
+
     if not user or user["password"] != data.password:
         return 401, {"message": "Invalid credentials"}
 
     otp = generate_otp()
     save_otp(username, otp)
 
-    ok, msg = send_otp_email(otp, user["role"])
-    if not ok:
-        return 401, {"message": msg}
+    # ✅ ALWAYS send OTP to MailConfig.OTP_RECIPIENT (thrinethra098@gmail.com)
+    send_otp_email(otp=otp)
 
     return {"message": "OTP sent successfully"}
 
 
-@auth_router.post("/verify-otp", response=MessageResponse)
+# =========================
+# VERIFY OTP
+# =========================
+@auth_router.post("/verify-otp", response={200: MessageResponse, 401: MessageResponse})
 def verify(request, data: OTPVerifyRequest):
-    ok, msg = verify_otp(data.username.lower(), data.otp)
+    username = data.username.lower()
+    ok, msg = verify_otp(username, data.otp)
     if not ok:
         return 401, {"message": msg}
     return {"message": msg}
 
 
-@auth_router.get("/success", response=TokenResponse)
+# =========================
+# SUCCESS → ISSUE JWT
+# =========================
+@auth_router.get("/success", response={200: TokenResponse, 401: MessageResponse})
 def success(request, username: str):
+    username = username.lower()
     if not is_verified(username):
         return 401, {"message": "OTP not verified"}
 

@@ -60,11 +60,11 @@
   "gallery": [
     {
       "id": 1,
-      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769255226/karfzabmyjyetawetm34.jpg",
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769668474/vy4nt5xb5coxzpt0yv9v.jpg",
       "cardTitle": "Detection Result #1",
       "sectionTitle": "Object Statistics",
       "meta": {
-        "date": "2026-01-24",
+        "date": "2026-01-29",
         "location": "Processing Lab"
       },
       "metrics": [
@@ -86,11 +86,11 @@
     },
     {
       "id": 2,
-      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769255227/l7eebv0r22cwmmoelana.jpg",
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769668475/uok9wgautiqg8nacs6t0.jpg",
       "cardTitle": "Detection Result #2",
       "sectionTitle": "Object Statistics",
       "meta": {
-        "date": "2026-01-24",
+        "date": "2026-01-29",
         "location": "Processing Lab"
       },
       "metrics": [
@@ -113,11 +113,11 @@
     },
     {
       "id": 3,
-      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769255228/fowidexu2gaiybo6w3d4.jpg",
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769668476/y9s7nmykq7ihadquvifc.jpg",
       "cardTitle": "Detection Result #3",
       "sectionTitle": "Object Statistics",
       "meta": {
-        "date": "2026-01-24",
+        "date": "2026-01-29",
         "location": "Processing Lab"
       },
       "metrics": [
@@ -139,11 +139,11 @@
     },
     {
       "id": 4,
-      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769255229/bqvbidzbnl3wmd4kncwh.jpg",
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769668477/xtwv22peve8ladlori99.jpg",
       "cardTitle": "Detection Result #4",
       "sectionTitle": "Object Statistics",
       "meta": {
-        "date": "2026-01-24",
+        "date": "2026-01-29",
         "location": "Processing Lab"
       },
       "metrics": [
@@ -165,11 +165,11 @@
     },
     {
       "id": 5,
-      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769255229/d3xszsmxqftf0n7ddrdg.jpg",
+      "mainImage": "https://res.cloudinary.com/dsy9rpwns/image/upload/v1769668477/tpryehkfv0jxn53bsmwi.jpg",
       "cardTitle": "Detection Result #5",
       "sectionTitle": "Object Statistics",
       "meta": {
-        "date": "2026-01-24",
+        "date": "2026-01-29",
         "location": "Processing Lab"
       },
       "metrics": [
@@ -194,6 +194,6 @@
     "project_id": "project_2",
     "total_images": 5,
     "total_detections": 7,
-    "generated_on": "2026-01-24"
+    "generated_on": "2026-01-29"
   }
 }

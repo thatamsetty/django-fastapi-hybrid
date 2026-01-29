@@ -5,6 +5,7 @@ import os, cv2, yaml, json, natsort, threading
 import cloudinary
 import cloudinary.uploader
 from django.conf import settings
+from django.db import close_old_connections
 
 from .models import ProjectStatus
 from auth_app.otp_service import send_download_link_email, send_rejection_email
@@ -55,7 +56,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # =====================================================
-# ANALYTICS GENERATOR (FRONTEND SAFE)
+# ANALYTICS GENERATOR
 # =====================================================
 def update_analytics_data(final_data: dict, project_id: str):
 
@@ -102,12 +103,14 @@ def update_analytics_data(final_data: dict, project_id: str):
         json.dump(analytics, f, indent=2)
 
 # =====================================================
-# MAIN PIPELINE
+# MAIN PIPELINE (THREAD SAFE)
 # =====================================================
 def run_pipeline(project_id: str, dataset_path: str):
 
-    # deactivate previous project
-    ProjectStatus.objects.all().update(active=False)
+    close_old_connections()  # 🔥 CRITICAL FOR THREADS
+
+    # deactivate previous projects
+    ProjectStatus.objects.all().update(active=False, running=False)
 
     status = ProjectStatus.objects.create(
         project_id=project_id,
@@ -186,6 +189,7 @@ def run_pipeline(project_id: str, dataset_path: str):
             json.dump(final_data, f, indent=2)
 
         update_analytics_data(final_data, project_id)
+
         status.completed = True
 
     except Exception as e:
@@ -194,14 +198,15 @@ def run_pipeline(project_id: str, dataset_path: str):
 
     finally:
         status.running = False
+        status.active = True
         status.save()
-
 
 # =====================================================
 # START PROCESSING
 # =====================================================
 @processing_router.post("/start-processing", tags=["PROJECT PROCESSING API'S"])
 def start_processing(request, data: StartProcessRequest):
+
     dataset_path = PROJECT_PATH_MAP.get(data.project_id)
     if not dataset_path:
         return 404, {"error": "Invalid project_id"}
@@ -219,7 +224,8 @@ def start_processing(request, data: StartProcessRequest):
 # =====================================================
 @processing_router.get("/get-result", tags=["PROJECT PROCESSING API'S"])
 def get_result(request):
-    status = ProjectStatus.objects.first()
+
+    status = ProjectStatus.objects.filter(active=True).first()
     if not status:
         return {"processing": False, "images": []}
 
@@ -247,11 +253,11 @@ def get_result(request):
 # =====================================================
 @processing_router.get("/get-analytics", tags=["PROJECT PROCESSING API'S"])
 def get_analytics(request):
+
     import random
 
     status = ProjectStatus.objects.filter(active=True).first()
 
-    # SAFE EMPTY (prevents white screen)
     safe = {
         "barData": [],
         "pieData": [],
@@ -269,32 +275,18 @@ def get_analytics(request):
     with open(path) as f:
         a = json.load(f)
 
-    # -----------------------------
-    # 1. BAR CHART (Recharts)
-    # -----------------------------
+    # BAR
     barData = []
     for label, value in zip(a["barData"]["labels"], a["barData"]["values"]):
-        barData.append({
-            "name": f"Image {label}",
-            "Total": value,
-            "Images": 1
-        })
+        barData.append({"name": f"Image {label}", "Total": value, "Images": 1})
 
-    # -----------------------------
-    # 2. PIE CHART
-    # -----------------------------
+    # PIE
     pieData = []
     colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]
     for i, (label, value) in enumerate(zip(a["pieData"]["labels"], a["pieData"]["values"])):
-        pieData.append({
-            "name": label,
-            "value": value,
-            "color": colors[i % len(colors)]
-        })
+        pieData.append({"name": label, "value": value, "color": colors[i % len(colors)]})
 
-    # -----------------------------
-    # 3. AREA CHART
-    # -----------------------------
+    # AREA
     areaData = []
     for i, total in enumerate(a["areaData"]["values"]):
         areaData.append({
@@ -304,9 +296,7 @@ def get_analytics(request):
             "Zebra": random.randint(0, total)
         })
 
-    # -----------------------------
-    # 4. LINE CHART
-    # -----------------------------
+    # LINE
     lineData = []
     for i, val in enumerate(a["lineData"]["values"]):
         lineData.append({
@@ -321,7 +311,6 @@ def get_analytics(request):
         "areaData": areaData,
         "lineData": lineData
     }
-
 
 # =====================================================
 # FILE UPLOAD
@@ -340,6 +329,11 @@ def reject_image(request, data: RejectionRequest):
     send_rejection_email(data.image_id, data.image_url)
     return {"status": "success"}
 
+# =====================================================
+# STATIC JSON APIs
+# =====================================================
+def _load_json(path):
+    return json.load(open(path)) if os.path.exists(path) else []
 # =====================================================
 # STATIC JSON APIs
 # =====================================================

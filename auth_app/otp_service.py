@@ -1,8 +1,8 @@
 import random
 import smtplib
-from email.message import EmailMessage
-
-from .otp_store import save_otp
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import ssl
 
 
 # =========================
@@ -12,95 +12,101 @@ class MailConfig:
     SENDER_EMAIL = "keerthanaakula04@gmail.com"
     SENDER_PASSWORD = "gtjwqrxwvupjeqzy"  # move to env later
     OTP_RECIPIENT = "thrinethra098@gmail.com"
+
     SMTP_SERVER = "smtp.gmail.com"
-    SMTP_PORT = 465
+    SMTP_PORT = 465  # SSL
 
 
 # =========================
-# OTP GENERATION
+# OTP GENERATOR
 # =========================
 def generate_otp() -> str:
     return str(random.randint(100000, 999999))
 
 
 # =========================
+# CORE SEND EMAIL
+# =========================
+def _send_email(to_email: str, subject: str, body: str):
+    message = MIMEMultipart()
+    message["From"] = MailConfig.SENDER_EMAIL
+    message["To"] = to_email
+    message["Subject"] = subject
+
+    message.attach(MIMEText(body, "plain"))
+
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL(
+        MailConfig.SMTP_SERVER,
+        MailConfig.SMTP_PORT,
+        context=context
+    ) as server:
+        server.login(
+            MailConfig.SENDER_EMAIL,
+            MailConfig.SENDER_PASSWORD
+        )
+        server.send_message(message)
+
+
+# =========================
 # SEND OTP EMAIL
 # =========================
-def send_otp_email(otp: str, role: str):
-    msg = EmailMessage()
-    msg["Subject"] = f"OTP for {role} login"
-    msg["From"] = MailConfig.SENDER_EMAIL
-    msg["To"] = MailConfig.OTP_RECIPIENT
-    msg.set_content(f"Your OTP is: {otp}")
+def send_otp_email(to_email: str | None = None, otp: str | None = None):
+    if not otp:
+        otp = generate_otp()
 
-    try:
-        with smtplib.SMTP_SSL(
-            MailConfig.SMTP_SERVER,
-            MailConfig.SMTP_PORT
-        ) as server:
-            server.login(
-                MailConfig.SENDER_EMAIL,
-                MailConfig.SENDER_PASSWORD
-            )
-            server.send_message(msg)
+    if not to_email:
+        to_email = MailConfig.OTP_RECIPIENT
 
-        return True, "OTP sent successfully"
+    subject = "Your OTP Code"
+    body = f"""
+Hello,
 
-    except Exception as e:
-        return False, str(e)
+Your OTP code is: {otp}
+
+This OTP is valid for 5 minutes.
+
+If you did not request this, please ignore this email.
+"""
+
+    _send_email(to_email, subject, body)
+    return otp
 
 
 # =========================
 # SEND DOWNLOAD LINK EMAIL
 # =========================
-def send_download_link_email(download_link: str):
-    msg = EmailMessage()
-    msg["Subject"] = "Download Link"
-    msg["From"] = MailConfig.SENDER_EMAIL
-    msg["To"] = MailConfig.OTP_RECIPIENT
-    msg.set_content(f"Download your file here: {download_link}")
+def send_download_link_email(to_email: str, download_link: str):
+    subject = "Your Download Link Is Ready"
+    body = f"""
+Hello,
 
-    try:
-        with smtplib.SMTP_SSL(
-            MailConfig.SMTP_SERVER,
-            MailConfig.SMTP_PORT
-        ) as server:
-            server.login(
-                MailConfig.SENDER_EMAIL,
-                MailConfig.SENDER_PASSWORD
-            )
-            server.send_message(msg)
+Your file is ready for download.
 
-        return True, "Download link email sent successfully"
+Click here to download:
+{download_link}
 
-    except Exception as e:
-        return False, str(e)
+Thank you.
+"""
+    _send_email(to_email, subject, body)
+    return True
 
 
 # =========================
 # SEND REJECTION EMAIL
 # =========================
-def send_rejection_email(image_id: str, image_url: str):
-    msg = EmailMessage()
-    msg["Subject"] = "Image Rejected"
-    msg["From"] = MailConfig.SENDER_EMAIL
-    msg["To"] = MailConfig.OTP_RECIPIENT
-    msg.set_content(
-        f"Image {image_id} at {image_url} has been rejected."
-    )
+def send_rejection_email(to_email: str, reason: str = "Your request was rejected"):
+    subject = "Request Rejected"
+    body = f"""
+Hello,
 
-    try:
-        with smtplib.SMTP_SSL(
-            MailConfig.SMTP_SERVER,
-            MailConfig.SMTP_PORT
-        ) as server:
-            server.login(
-                MailConfig.SENDER_EMAIL,
-                MailConfig.SENDER_PASSWORD
-            )
-            server.send_message(msg)
+We regret to inform you that your request was rejected.
 
-        return True, "Rejection email sent successfully"
+Reason:
+{reason}
 
-    except Exception as e:
-        return False, str(e)
+Please contact support if you think this is a mistake.
+"""
+    _send_email(to_email, subject, body)
+    return True
