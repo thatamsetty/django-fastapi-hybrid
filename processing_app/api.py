@@ -6,6 +6,7 @@ import cloudinary
 import cloudinary.uploader
 from django.conf import settings
 from django.db import close_old_connections
+from django.utils import timezone
 
 from .models import ProjectStatus
 from auth_app.otp_service import send_download_link_email, send_rejection_email
@@ -59,11 +60,8 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 # ANALYTICS GENERATOR
 # =====================================================
 def update_analytics_data(final_data: dict, project_id: str):
-    labels = []
-    bar_values = []
-    cumulative_values = []
-    pie_map = {}
-    running_total = 0
+    labels, bar_values, cumulative_values = [], [], []
+    pie_map, running_total = {}, 0
 
     for img in final_data.get("images", []):
         img_id = img.get("id", 0)
@@ -84,10 +82,13 @@ def update_analytics_data(final_data: dict, project_id: str):
         "barData": {"labels": labels, "values": bar_values},
         "lineData": {"labels": labels, "values": bar_values},
         "areaData": {"labels": labels, "values": cumulative_values},
-        "pieData": {
-            "labels": list(pie_map.keys()),
-            "values": list(pie_map.values())
-        },
+        "pieData": {"labels": list(pie_map.keys()), "values": list(pie_map.values())},
+        "summary": {
+            "project_id": project_id,
+            "total_images": len(labels),
+            "total_detections": running_total,
+            "generated_on": date.today().isoformat()
+        }
     }
 
     path = os.path.join(settings.BASE_DIR, f"analytics_{project_id}.json")
@@ -100,13 +101,17 @@ def update_analytics_data(final_data: dict, project_id: str):
 def run_pipeline(project_id: str, dataset_path: str):
     close_old_connections()
 
-    ProjectStatus.objects.all().update(active=False, running=False)
+    # deactivate all
+    ProjectStatus.objects.all().update(active=False, running=False, completed=False)
 
-    status = ProjectStatus.objects.create(
+    # SAFE create/update (NO DUPLICATE CRASH)
+    status, _ = ProjectStatus.objects.update_or_create(
         project_id=project_id,
-        active=True,
-        running=True,
-        completed=False
+        defaults={
+            "active": True,
+            "running": True,
+            "completed": False
+        }
     )
 
     try:
@@ -118,6 +123,7 @@ def run_pipeline(project_id: str, dataset_path: str):
         labels_dir = os.path.join(dataset_path, "train", "labels")
 
         final_data = {"project_id": project_id, "images": []}
+        today = date.today().isoformat()
 
         for idx, img_name in enumerate(natsort.natsorted(os.listdir(images_dir)), start=1):
             if not img_name.lower().endswith((".jpg", ".jpeg", ".png")):
@@ -147,6 +153,8 @@ def run_pipeline(project_id: str, dataset_path: str):
                         y2 = int((y + bh / 2) * h)
 
                         cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                        cv2.putText(img, label, (x1, max(20, y1 - 5)),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
             out_path = os.path.join(OUTPUT_DIR, f"{project_id}_{img_name}")
             cv2.imwrite(out_path, img)
@@ -155,38 +163,50 @@ def run_pipeline(project_id: str, dataset_path: str):
             final_data["images"].append({
                 "id": idx,
                 "mainImage": upload["secure_url"],
+                "metrics": [
+                    {"label": "Total Objects", "value": str(count)},
+                    {"label": "Detected Classes", "value": ", ".join(classes) if classes else "None"}
+                ],
                 "_raw": {"count": count, "classes": list(classes)}
             })
 
+        # save results
         with open(os.path.join(settings.BASE_DIR, f"result_{project_id}.json"), "w") as f:
             json.dump(final_data, f, indent=2)
 
         update_analytics_data(final_data, project_id)
 
+        status.completed = True
+
+    except Exception as e:
+        with open(os.path.join(settings.BASE_DIR, f"result_{project_id}.json"), "w") as f:
+            json.dump({"error": str(e)}, f)
+
     finally:
         status.running = False
+        status.active = True
         status.save()
 
 # =====================================================
-# START PROCESSING
+# API ROUTES
 # =====================================================
-@processing_router.post("/start-processing", response={200: dict, 404: dict})
+@processing_router.post("/start-processing", tags=["PROJECT PROCESSING API'S"])
 def start_processing(request, data: StartProcessRequest):
     dataset_path = PROJECT_PATH_MAP.get(data.project_id)
     if not dataset_path:
-        return 404, {"error": "Invalid project_id"}
+        return {"error": "Invalid project_id"}
 
     threading.Thread(target=run_pipeline, args=(data.project_id, dataset_path), daemon=True).start()
-    return {"message": "Processing started"}
+    return {"message": f"Processing started for {data.project_id}"}
 
-# =====================================================
-# GET RESULT
-# =====================================================
-@processing_router.get("/get-result", response={200: dict})
+@processing_router.get("/get-result", tags=["PROJECT PROCESSING API'S"])
 def get_result(request):
     status = ProjectStatus.objects.filter(active=True).first()
     if not status:
         return {"processing": False, "images": []}
+
+    if status.running:
+        return {"processing": True, "images": []}
 
     path = os.path.join(settings.BASE_DIR, f"result_{status.project_id}.json")
     if not os.path.exists(path):
@@ -194,34 +214,28 @@ def get_result(request):
 
     return json.load(open(path))
 
-# =====================================================
-# GET ANALYTICS
-# =====================================================
-@processing_router.get("/get-analytics", response={200: dict})
+@processing_router.get("/get-analytics", tags=["PROJECT PROCESSING API'S"])
 def get_analytics(request):
     status = ProjectStatus.objects.filter(active=True).first()
     if not status:
-        return {}
+        return {"barData": [], "pieData": [], "areaData": [], "lineData": []}
 
     path = os.path.join(settings.BASE_DIR, f"analytics_{status.project_id}.json")
     if not os.path.exists(path):
-        return {}
+        return {"barData": [], "pieData": [], "areaData": [], "lineData": []}
 
     return json.load(open(path))
 
 # =====================================================
-# FILE UPLOAD
+# FILE UPLOAD & REJECT
 # =====================================================
-@processing_router.post("/upload-file", response={200: dict})
+@processing_router.post("/upload-file", tags=["FILE UPLOAD,REJECT API"])
 def upload_file(request, file: UploadedFile = File(...)):
     upload = cloudinary.uploader.upload(file.file, resource_type="raw")
     send_download_link_email(upload["secure_url"])
     return {"status": "success", "download_link": upload["secure_url"]}
 
-# =====================================================
-# REJECT IMAGE
-# =====================================================
-@processing_router.post("/reject-image", response={200: dict})
+@processing_router.post("/reject-image", tags=["FILE UPLOAD,REJECT API"])
 def reject_image(request, data: RejectionRequest):
     send_rejection_email(data.image_id, data.image_url)
     return {"status": "success"}
