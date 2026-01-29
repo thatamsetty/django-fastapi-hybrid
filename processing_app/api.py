@@ -246,12 +246,23 @@ def get_result(request):
 
 @processing_router.get("/get-analytics", tags=["Project Processing"])
 def get_analytics(request):
+    import os
+
     status = ProjectStatus.objects.filter(active=True).first()
     if not status:
-        return {}
+        return {
+            "error": "NO ACTIVE PROJECT",
+            "projects_in_db": list(ProjectStatus.objects.values())
+        }
 
     path = os.path.join(settings.BASE_DIR, f"analytics_{status.project_id}.json")
-    return safe_load_json(path, {})
+
+    return {
+        "active_project": status.project_id,
+        "file_path": path,
+        "file_exists": os.path.exists(path),
+        "file_content": safe_load_json(path, {"error": "FILE EMPTY OR NOT FOUND"})
+    }
 
 # =====================================================
 # STATIC JSON APIs
