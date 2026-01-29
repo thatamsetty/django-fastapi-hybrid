@@ -315,36 +315,37 @@ def get_analytics(request):
 
 
 # =====================================================
-# STATIC JSON APIs
+# STATIC JSON APIs (PURE JSON - NO WRAPPERS)
 # =====================================================
-@processing_router.get("/get-alerts", response=dict, tags=["Static Data"])
+
+@processing_router.get("/get-alerts", tags=["Static Data"])
 def get_alerts(request):
-    return {"data": safe_load_json(ALERTS_FILE, [])}
+    return safe_load_json(ALERTS_FILE, [])
 
-@processing_router.get("/get-projects", response=dict, tags=["Static Data"])
+@processing_router.get("/get-projects", tags=["Static Data"])
 def get_projects(request):
-    return {"data": safe_load_json(PROJECTS_FILE, [])}
+    return safe_load_json(PROJECTS_FILE, [])
 
-@processing_router.get("/user-management", response=dict, tags=["Static Data"])
+@processing_router.get("/user-management", tags=["Static Data"])
 def user_management(request):
-    return {"data": safe_load_json(USER_MANAGEMENT, {})}
+    return safe_load_json(USER_MANAGEMENT, {})
 
-@processing_router.get("/admin-management", response=dict, tags=["Static Data"])
+@processing_router.get("/admin-management", tags=["Static Data"])
 def admin_management(request):
-    return {"data": safe_load_json(ADMIN_MANAGEMENT, {})}
+    return safe_load_json(ADMIN_MANAGEMENT, {})
 
-@processing_router.get("/dashboard-data", response=dict, tags=["Static Data"])
+@processing_router.get("/dashboard-data", tags=["Static Data"])
 def dashboard_data(request):
-    return {"data": safe_load_json(DASHBOARD_DATA, {})}
+    return safe_load_json(DASHBOARD_DATA, {})
 
-@processing_router.get("/client-data", response=dict, tags=["Static Data"])
+@processing_router.get("/client-data", tags=["Static Data"])
 def client_data(request):
-    return {"data": safe_load_json(CLIENT_DATA, [])}
+    return safe_load_json(CLIENT_DATA, [])
 
-@processing_router.get("/industries", response=dict, tags=["Static Data"])
+@processing_router.get("/industries", tags=["Static Data"])
 def industries(request):
-    return {"data": safe_load_json(INDUSTRIES, [])}
+    return safe_load_json(INDUSTRIES, [])
 
-@processing_router.get("/recent-projects", response=dict, tags=["Static Data"])
+@processing_router.get("/recent-projects", tags=["Static Data"])
 def recent_projects(request):
-    return {"data": safe_load_json(RECENT_PROJECTS, [])}
+    return safe_load_json(RECENT_PROJECTS, [])
