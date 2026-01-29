@@ -1,6 +1,5 @@
 from pathlib import Path
 import os
-import mongoengine
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # =========================
 SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY",
-    "aip-django-fastapi-mongodb-secure-key-2026"
+    "aip-django-fastapi-secure-key"
 )
 
 DEBUG = False
@@ -40,6 +39,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+
     "whitenoise.middleware.WhiteNoiseMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -49,7 +49,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
 
 # =========================
 # CORS
@@ -85,6 +84,11 @@ TEMPLATES = [
 ]
 
 # =========================
+# DATABASE (NOT USED)
+# =========================
+DATABASES = {}
+
+# =========================
 # INTERNATIONALIZATION
 # =========================
 LANGUAGE_CODE = "en-us"
@@ -113,18 +117,3 @@ NINJA_MAX_PER_PAGE_SIZE = 1000
 # JWT
 # =========================
 SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT", "akin-777")
-
-# =========================
-# MONGODB (ATLAS / LOCAL)
-# =========================
-MONGO_URI = os.getenv("MONGO_URI")
-
-if MONGO_URI:
-    mongoengine.connect(host=MONGO_URI)
-else:
-    # Local development fallback
-    mongoengine.connect(
-        db="aip_database",
-        host="localhost",
-        port=27017,
-    )
