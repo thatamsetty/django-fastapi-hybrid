@@ -235,59 +235,56 @@ def start_processing(request, data: StartProcessRequest):
 @processing_router.get("/get-analytics", tags=["Project Processing"])
 def get_analytics(request):
     import os
-    import random
 
     status = ProjectStatus.objects.filter(active=True).first()
     if not status:
-        return {
-            "barData": [],
-            "pieData": [],
-            "areaData": [],
-            "lineData": []
-        }
+        return {"barData": [], "pieData": [], "areaData": [], "lineData": []}
 
     path = os.path.join(settings.BASE_DIR, f"analytics_{status.project_id}.json")
     data = safe_load_json(path, {})
 
-    class_counts = data.get("class_counts", {})
+    # ----------------------------
+    # READ YOUR REAL ANALYTICS JSON
+    # ----------------------------
+    bar_raw = data.get("barData", {})
+    pie_raw = data.get("pieData", {})
+    area_raw = data.get("areaData", {})
 
     # ----------------------------
-    # BAR CHART DATA
+    # BUILD BAR DATA
     # ----------------------------
     barData = []
-    for cls, count in class_counts.items():
+    for i in range(len(bar_raw.get("labels", []))):
         barData.append({
-            "name": cls,
-            "Total": count,
-            "Images": max(1, count // 2)
+            "name": str(bar_raw["labels"][i]),
+            "Total": bar_raw["values"][i],
+            "Images": max(1, bar_raw["values"][i] // 2)
         })
 
     # ----------------------------
-    # PIE CHART DATA
+    # BUILD PIE DATA
     # ----------------------------
     colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"]
     pieData = []
-    i = 0
-    for cls, count in class_counts.items():
+    for i in range(len(pie_raw.get("labels", []))):
         pieData.append({
-            "name": cls,
-            "value": count,
+            "name": pie_raw["labels"][i],
+            "value": pie_raw["values"][i],
             "color": colors[i % len(colors)]
         })
-        i += 1
 
     # ----------------------------
-    # AREA CHART DATA (FAKE TREND)
+    # BUILD AREA DATA
     # ----------------------------
     areaData = []
-    for i in range(1, 6):
-        row = {"name": f"Batch {i}"}
-        for cls, count in class_counts.items():
-            row[cls] = max(1, int(count * (i / 5)))
-        areaData.append(row)
+    for i in range(len(area_raw.get("labels", []))):
+        areaData.append({
+            "name": f"Image {area_raw['labels'][i]}",
+            "Total": area_raw["values"][i]
+        })
 
     # ----------------------------
-    # LINE CHART DATA (MODEL PERF)
+    # LINE DATA (KEEP YOUR WORKING ONE)
     # ----------------------------
     lineData = [
         {"name": "Run 1", "Detections": 120, "Confidence": 82},
@@ -303,6 +300,7 @@ def get_analytics(request):
         "areaData": areaData,
         "lineData": lineData
     }
+
 
 
 # =====================================================
