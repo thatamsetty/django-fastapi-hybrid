@@ -232,37 +232,48 @@ def start_processing(request, data: StartProcessRequest):
     threading.Thread(target=run_pipeline, args=(data.project_id, dataset_path), daemon=True).start()
     return {"message": f"Processing started for {data.project_id}"}
 
-@processing_router.get("/get-result", tags=["Project Processing"])
-def get_result(request):
-    status = ProjectStatus.objects.filter(active=True).first()
-    if not status:
-        return {"processing": False, "images": []}
-
-    if status.running:
-        return {"processing": True, "images": []}
-
-    path = os.path.join(settings.BASE_DIR, f"result_{status.project_id}.json")
-    return safe_load_json(path, {"processing": False, "images": []})
-
 @processing_router.get("/get-analytics", tags=["Project Processing"])
 def get_analytics(request):
     import os
 
     status = ProjectStatus.objects.filter(active=True).first()
     if not status:
-        return {
-            "error": "NO ACTIVE PROJECT",
-            "projects_in_db": list(ProjectStatus.objects.values())
-        }
+        return {"error": "No active project"}
 
     path = os.path.join(settings.BASE_DIR, f"analytics_{status.project_id}.json")
+    data = safe_load_json(path, {})
+
+    if not data:
+        return {"error": "Analytics file empty or not generated"}
+
+    class_counts = data.get("class_counts", {})
+
+    labels = list(class_counts.keys())
+    values = list(class_counts.values())
 
     return {
-        "active_project": status.project_id,
-        "file_path": path,
-        "file_exists": os.path.exists(path),
-        "file_content": safe_load_json(path, {"error": "FILE EMPTY OR NOT FOUND"})
+        "bar": {
+            "labels": labels,
+            "values": values
+        },
+        "pie": {
+            "labels": labels,
+            "values": values
+        },
+        "line": {
+            "labels": labels,
+            "values": values
+        },
+        "area": {
+            "labels": labels,
+            "values": values
+        },
+        "summary": {
+            "total_images": data.get("total_images", 0),
+            "total_objects": data.get("total_objects", 0)
+        }
     }
+
 
 # =====================================================
 # STATIC JSON APIs
