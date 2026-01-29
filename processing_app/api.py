@@ -232,6 +232,18 @@ def start_processing(request, data: StartProcessRequest):
     threading.Thread(target=run_pipeline, args=(data.project_id, dataset_path), daemon=True).start()
     return {"message": f"Processing started for {data.project_id}"}
 
+@processing_router.get("/get-result", tags=["Project Processing"])
+def get_result(request):
+    status = ProjectStatus.objects.filter(active=True).first()
+    if not status:
+        return {"processing": False, "images": []}
+
+    if status.running:
+        return {"processing": True, "images": []}
+
+    path = os.path.join(settings.BASE_DIR, f"result_{status.project_id}.json")
+    return safe_load_json(path, {"processing": False, "images": []})
+
 @processing_router.get("/get-analytics", tags=["Project Processing"])
 def get_analytics(request):
     import os
@@ -300,7 +312,6 @@ def get_analytics(request):
         "areaData": areaData,
         "lineData": lineData
     }
-
 
 
 # =====================================================
