@@ -250,26 +250,26 @@ def reject_image(request, data: RejectionRequest):
 # =====================================================
 # STATIC JSON APIs
 # =====================================================
-@processing_router.get("/get-alerts", response={200: dict})
-def get_alerts(request): return safe_load_json(ALERTS_FILE, {})
+@processing_router.get("/get-alerts")
+def get_alerts(request): return _load_json(ALERTS_FILE)
 
-@processing_router.get("/get-projects", response={200: dict})
-def get_projects(request): return safe_load_json(PROJECTS_FILE, {})
+@processing_router.get("/get-projects")
+def get_projects(request): return _load_json(PROJECTS_FILE)
 
-@processing_router.get("/user-management", response={200: dict})
-def user_management(request): return safe_load_json(USER_MANAGEMENT, {})
+@processing_router.get("/user-management")
+def user_management(request): return _load_json(USER_MANAGEMENT)
 
-@processing_router.get("/admin-management", response={200: dict})
-def admin_management(request): return safe_load_json(ADMIN_MANAGEMENT, {})
+@processing_router.get("/admin-management")
+def admin_management(request): return _load_json(ADMIN_MANAGEMENT)
 
-@processing_router.get("/dashboard-data", response={200: dict})
-def dashboard_data(request): return safe_load_json(DASHBOARD_DATA, {})
+@processing_router.get("/dashboard-data")
+def dashboard_data(request): return _load_json(DASHBOARD_DATA)
 
-@processing_router.get("/client-data", response={200: dict})
-def client_data(request): return safe_load_json(CLIENT_DATA, {})
+@processing_router.get("/client-data")
+def client_data(request): return _load_json(CLIENT_DATA)
 
-@processing_router.get("/industries", response={200: dict})
-def industries(request): return safe_load_json(INDUSTRIES, {})
+@processing_router.get("/industries")
+def industries(request): return _load_json(INDUSTRIES)
 
-@processing_router.get("/recent-projects", response={200: dict})
-def recent_projects(request): return safe_load_json(RECENT_PROJECTS, {})
+@processing_router.get("/recent-projects")
+def recent_projects(request): return _load_json(RECENT_PROJECTS)
