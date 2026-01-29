@@ -1,60 +1,57 @@
 import os
 import random
-import smtplib
-import ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
+import requests
 
 # =========================
-# MAIL CONFIG (FROM RENDER ENV)
+# CONFIG
 # =========================
-class MailConfig:
-    SMTP_SERVER = os.getenv("SMTP_SERVER")           # smtp-relay.brevo.com
-    SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))   # 587
-    SMTP_USER = os.getenv("SMTP_USER")               # apikey
-    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")       # YOUR_BREVO_API_KEY
-    SENDER_EMAIL = os.getenv("SENDER_EMAIL")         # your verified sender
+
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+
+if not BREVO_API_KEY or not SENDER_EMAIL:
+    raise Exception("❌ BREVO_API_KEY or SENDER_EMAIL not set in environment variables!")
 
 
 # =========================
 # OTP GENERATOR
 # =========================
+
 def generate_otp() -> str:
     return str(random.randint(100000, 999999))
 
 
 # =========================
-# CORE SEND EMAIL
+# CORE SEND EMAIL (BREVO API)
 # =========================
+
 def _send_email(to_email: str, subject: str, body: str):
 
-    if not all([
-        MailConfig.SMTP_SERVER,
-        MailConfig.SMTP_PASSWORD,
-        MailConfig.SENDER_EMAIL,
-        MailConfig.SMTP_USER,
-    ]):
-        raise Exception("❌ Email environment variables are not configured!")
+    url = "https://api.brevo.com/v3/smtp/email"
 
-    message = MIMEMultipart()
-    message["From"] = MailConfig.SENDER_EMAIL
-    message["To"] = to_email
-    message["Subject"] = subject
+    headers = {
+        "accept": "application/json",
+        "api-key": BREVO_API_KEY,
+        "content-type": "application/json",
+    }
 
-    message.attach(MIMEText(body, "plain"))
+    payload = {
+        "sender": {"email": SENDER_EMAIL, "name": "My App"},
+        "to": [{"email": to_email}],
+        "subject": subject,
+        "textContent": body,
+    }
 
-    context = ssl.create_default_context()
+    response = requests.post(url, json=payload, headers=headers, timeout=30)
 
-    with smtplib.SMTP(MailConfig.SMTP_SERVER, MailConfig.SMTP_PORT) as server:
-        server.starttls(context=context)
-        server.login(MailConfig.SMTP_USER, MailConfig.SMTP_PASSWORD)
-        server.send_message(message)
+    if response.status_code not in (200, 201, 202):
+        raise Exception(f"❌ Brevo API Error: {response.status_code} {response.text}")
 
 
 # =========================
 # SEND OTP EMAIL
 # =========================
+
 def send_otp_email(to_email: str, otp: str | None = None):
     if not otp:
         otp = generate_otp()
@@ -77,6 +74,7 @@ If you did not request this, please ignore this email.
 # =========================
 # SEND DOWNLOAD LINK EMAIL
 # =========================
+
 def send_download_link_email(to_email: str, download_link: str):
     subject = "Your Download Link Is Ready"
     body = f"""
@@ -96,6 +94,7 @@ Thank you.
 # =========================
 # SEND REJECTION EMAIL
 # =========================
+
 def send_rejection_email(to_email: str, reason: str = "Your request was rejected"):
     subject = "Request Rejected"
     body = f"""

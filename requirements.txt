@@ -16,3 +16,6 @@ numpy==1.26.4
 cloudinary==1.29.0
 pyyaml==6.0.3
 natsort==8.2.0
+
+requests
+
