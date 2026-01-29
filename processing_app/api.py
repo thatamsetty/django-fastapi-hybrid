@@ -13,7 +13,7 @@ from auth_app.otp_service import send_download_link_email, send_rejection_email
 processing_router = Router()
 
 # =====================================================
-# CLOUDINARY CONFIG (FROM ENV — SAFE)
+# CLOUDINARY CONFIG (SAFE)
 # =====================================================
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
@@ -32,7 +32,7 @@ class RejectionRequest(Schema):
     image_url: str
 
 # =====================================================
-# PROJECT DATASET ROOT PATHS
+# PATHS
 # =====================================================
 BASE_DATASET_DIR = os.path.join(settings.BASE_DIR, "Datasets")
 
@@ -58,26 +58,26 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # =====================================================
-# SAFE JSON LOADER
+# SAFE JSON HELPERS
 # =====================================================
 def safe_load_json(path, default):
     try:
         if os.path.exists(path):
-            with open(path, "r") as f:
+            with open(path, "r", encoding="utf-8") as f:
                 return json.load(f)
-    except:
-        pass
+    except Exception as e:
+        print("JSON load error:", path, e)
     return default
 
-# =====================================================
-# SAFE JSON WRITER
-# =====================================================
 def safe_write_json(path, data):
-    with open(path, "w") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        print("JSON write error:", path, e)
 
 # =====================================================
-# ANALYTICS GENERATOR
+# ANALYTICS
 # =====================================================
 def update_analytics_data(final_data: dict, project_id: str):
     labels, bar_values, cumulative_values = [], [], []
@@ -163,10 +163,7 @@ def run_pipeline(project_id: str, dataset_path: str):
             if os.path.exists(label_path):
                 with open(label_path, "r") as lf:
                     for line in lf:
-                        line = line.strip()
-                        if not line:
-                            continue
-                        parts = line.split()
+                        parts = line.strip().split()
                         if len(parts) != 5:
                             continue
 
@@ -187,11 +184,12 @@ def run_pipeline(project_id: str, dataset_path: str):
             out_path = os.path.join(OUTPUT_DIR, f"{project_id}_{img_name}")
             cv2.imwrite(out_path, img)
 
+            image_url = ""
             try:
                 upload = cloudinary.uploader.upload(out_path)
-                image_url = upload["secure_url"]
+                image_url = upload.get("secure_url", "")
             except:
-                image_url = ""
+                pass
 
             final_data["images"].append({
                 "id": idx,
@@ -220,7 +218,7 @@ def run_pipeline(project_id: str, dataset_path: str):
         status.save()
 
 # =====================================================
-# PROJECT PROCESSING APIs
+# APIs
 # =====================================================
 @processing_router.post("/start-processing", tags=["Project Processing"])
 def start_processing(request, data: StartProcessRequest):
@@ -256,42 +254,36 @@ def get_analytics(request):
     return safe_load_json(path, {})
 
 # =====================================================
-# FILE UPLOAD & REJECT APIs
-# =====================================================
-@processing_router.post("/upload-file", tags=["File Management"])
-def upload_file(request, file: UploadedFile = File(...)):
-    upload = cloudinary.uploader.upload(file.file, resource_type="raw")
-    send_download_link_email(upload["secure_url"])
-    return {"status": "success", "download_link": upload["secure_url"]}
-
-@processing_router.post("/reject-image", tags=["File Management"])
-def reject_image(request, data: RejectionRequest):
-    send_rejection_email(data.image_id, data.image_url)
-    return {"status": "success"}
-
-# =====================================================
 # STATIC JSON APIs
 # =====================================================
-@processing_router.get("/get-alerts", tags=["Dashboard Data"])
-def get_alerts(request): return safe_load_json(ALERTS_FILE, [])
+@processing_router.get("/get-alerts", tags=["Static Data"])
+def get_alerts(request):
+    return {"data": safe_load_json(ALERTS_FILE, [])}
 
-@processing_router.get("/get-projects", tags=["Dashboard Data"])
-def get_projects(request): return safe_load_json(PROJECTS_FILE, [])
+@processing_router.get("/get-projects", tags=["Static Data"])
+def get_projects(request):
+    return {"data": safe_load_json(PROJECTS_FILE, [])}
 
-@processing_router.get("/user-management", tags=["Dashboard Data"])
-def user_management(request): return safe_load_json(USER_MANAGEMENT, {})
+@processing_router.get("/user-management", tags=["Static Data"])
+def user_management(request):
+    return {"data": safe_load_json(USER_MANAGEMENT, {})}
 
-@processing_router.get("/admin-management", tags=["Dashboard Data"])
-def admin_management(request): return safe_load_json(ADMIN_MANAGEMENT, {})
+@processing_router.get("/admin-management", tags=["Static Data"])
+def admin_management(request):
+    return {"data": safe_load_json(ADMIN_MANAGEMENT, {})}
 
-@processing_router.get("/dashboard-data", tags=["Dashboard Data"])
-def dashboard_data(request): return safe_load_json(DASHBOARD_DATA, {})
+@processing_router.get("/dashboard-data", tags=["Static Data"])
+def dashboard_data(request):
+    return {"data": safe_load_json(DASHBOARD_DATA, {})}
 
-@processing_router.get("/client-data", tags=["Dashboard Data"])
-def client_data(request): return safe_load_json(CLIENT_DATA, [])
+@processing_router.get("/client-data", tags=["Static Data"])
+def client_data(request):
+    return {"data": safe_load_json(CLIENT_DATA, [])}
 
-@processing_router.get("/industries", tags=["Dashboard Data"])
-def industries(request): return safe_load_json(INDUSTRIES, [])
+@processing_router.get("/industries", tags=["Static Data"])
+def industries(request):
+    return {"data": safe_load_json(INDUSTRIES, [])}
 
-@processing_router.get("/recent-projects", tags=["Dashboard Data"])
-def recent_projects(request): return safe_load_json(RECENT_PROJECTS, [])
+@processing_router.get("/recent-projects", tags=["Static Data"])
+def recent_projects(request):
+    return {"data": safe_load_json(RECENT_PROJECTS, [])}

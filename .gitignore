@@ -9,7 +9,6 @@ __pycache__/
 staticfiles/
 
 # Datasets & outputs
-Datasets/
 output_annotated_images/
 
 # Nested copy safety
