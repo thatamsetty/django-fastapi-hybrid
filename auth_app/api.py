@@ -2,17 +2,16 @@ from ninja import Router, Schema
 from datetime import datetime, timedelta
 import jwt
 from django.conf import settings
-from typing import Any
 
-from .models import OTPStore
-from .otp_service import generate_otp, save_otp, verify_otp, send_otp_email
+from .otp_service import generate_otp, send_otp_email
+from .otp_store import save_otp, verify_otp, is_verified
 
 auth_router = Router()
 
-# ---------- SCHEMAS ----------
 
 class MessageResponse(Schema):
     message: str
+
 
 class TokenResponse(Schema):
     status: str
@@ -20,17 +19,17 @@ class TokenResponse(Schema):
     role: str
     username: str
 
+
 class LoginRequest(Schema):
     username: str
     password: str
     required_role: str | None = None
 
+
 class OTPVerifyRequest(Schema):
     username: str
-    otp: Any
+    otp: str
 
-
-# ---------- USERS ----------
 
 USERS_DB = {
     "super_root": {
@@ -50,89 +49,53 @@ USERS_DB = {
     },
 }
 
-# ---------- LOGIN ----------
 
-@auth_router.post(
-    "/login",
-    response={200: MessageResponse, 401: MessageResponse, 500: MessageResponse},
-    tags=["AUTHENTICATION"]
-)
+@auth_router.post("/login", response={200: MessageResponse, 401: MessageResponse})
 def login(request, data: LoginRequest):
-    username = data.username.strip().lower()
+    username = data.username.lower()
 
     user = USERS_DB.get(username)
-    if not user:
-        return 401, {"message": "User not found"}
-
-    if user["password"] != data.password:
-        return 401, {"message": "Invalid password"}
-
-    if data.required_role and user["role"] != data.required_role:
-        return 401, {"message": "Invalid role"}
+    if not user or user["password"] != data.password:
+        return 401, {"message": "Invalid credentials"}
 
     otp = generate_otp()
     save_otp(username, otp)
 
-    email_ok, email_msg = send_otp_email(otp, user["role"])
-    if not email_ok:
-        return 500, {"message": email_msg}
+    ok, msg = send_otp_email(otp, user["role"])
+    if not ok:
+        return 401, {"message": msg}
 
     return {"message": "OTP sent successfully"}
 
 
-# ---------- VERIFY OTP ----------
-
-@auth_router.post(
-    "/verify-otp",
-    response={200: MessageResponse, 400: MessageResponse},
-    tags=["AUTHENTICATION"]
-)
+@auth_router.post("/verify-otp", response=MessageResponse)
 def verify(request, data: OTPVerifyRequest):
-    username = data.username.strip().lower()
-    otp = str(data.otp).strip()
-
-    success, message = verify_otp(username, otp)
-    if not success:
-        return 400, {"message": message}
-
-    return {"message": "OTP verified successfully"}
+    ok, msg = verify_otp(data.username.lower(), data.otp)
+    if not ok:
+        return 401, {"message": msg}
+    return {"message": msg}
 
 
-# ---------- SUCCESS ----------
-
-@auth_router.get(
-    "/success",
-    response={200: TokenResponse, 400: MessageResponse},
-    tags=["AUTHENTICATION"]
-)
+@auth_router.get("/success", response=TokenResponse)
 def success(request, username: str):
-    username = username.strip().lower()
+    if not is_verified(username):
+        return 401, {"message": "OTP not verified"}
 
-    record = OTPStore.objects(
-        username=username,
-        verified=True
-    ).order_by("-expires_at").first()
-
-    if not record:
-        return 400, {"message": "OTP not verified"}
-
-    user = USERS_DB.get(username)
-    if not user:
-        return 400, {"message": "User not found"}
+    user = USERS_DB[username]
 
     token = jwt.encode(
         {
             "username": username,
             "role": user["role"],
-            "exp": datetime.utcnow() + timedelta(minutes=30)
+            "exp": datetime.utcnow() + timedelta(minutes=30),
         },
-        settings.SECRET_KEY,
-        algorithm="HS256"
+        settings.SECRET_KEY_JWT,
+        algorithm="HS256",
     )
 
     return {
         "status": "success",
         "token": token,
         "role": user["role"],
-        "username": username
+        "username": username,
     }

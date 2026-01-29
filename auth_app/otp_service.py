@@ -1,68 +1,31 @@
 import random
 import smtplib
-from datetime import datetime, timedelta
 from email.message import EmailMessage
 
-from .models import OTPStore
+from .otp_store import save_otp
 
 
+# =========================
+# MAIL CONFIG
+# =========================
 class MailConfig:
     SENDER_EMAIL = "keerthanaakula04@gmail.com"
-    SENDER_PASSWORD = "gtjwqrxwvupjeqzy"  # ⚠️ move to .env in production
+    SENDER_PASSWORD = "gtjwqrxwvupjeqzy"  # move to env later
     OTP_RECIPIENT = "thrinethra098@gmail.com"
     SMTP_SERVER = "smtp.gmail.com"
     SMTP_PORT = 465
 
 
-# ---------- OTP GENERATION ----------
-
-def generate_otp():
+# =========================
+# OTP GENERATION
+# =========================
+def generate_otp() -> str:
     return str(random.randint(100000, 999999))
 
 
-# ---------- SAVE OTP ----------
-
-def save_otp(username: str, otp: str):
-    username = username.strip().lower()
-
-    OTPStore.objects(username=username, verified=False).delete()
-
-    OTPStore(
-        username=username,
-        otp=str(otp),
-        expires_at=datetime.utcnow() + timedelta(minutes=10),
-        verified=False
-    ).save()
-
-
-# ---------- VERIFY OTP ----------
-
-def verify_otp(username: str, otp):
-    username = username.strip().lower()
-    otp = str(otp).strip()
-
-    record = OTPStore.objects(
-        username=username,
-        verified=False
-    ).order_by("-expires_at").first()
-
-    if not record:
-        return False, "Invalid OTP"
-
-    if record.otp != otp:
-        return False, "Invalid OTP"
-
-    if datetime.utcnow() > record.expires_at:
-        return False, "OTP expired"
-
-    record.verified = True
-    record.save()
-
-    return True, "OTP verified successfully"
-
-
-# ---------- SEND OTP EMAIL ----------
-
+# =========================
+# SEND OTP EMAIL
+# =========================
 def send_otp_email(otp: str, role: str):
     msg = EmailMessage()
     msg["Subject"] = f"OTP for {role} login"
@@ -87,8 +50,9 @@ def send_otp_email(otp: str, role: str):
         return False, str(e)
 
 
-# ---------- SEND DOWNLOAD LINK EMAIL (RESTORED) ----------
-
+# =========================
+# SEND DOWNLOAD LINK EMAIL
+# =========================
 def send_download_link_email(download_link: str):
     msg = EmailMessage()
     msg["Subject"] = "Download Link"
@@ -113,8 +77,9 @@ def send_download_link_email(download_link: str):
         return False, str(e)
 
 
-# ---------- SEND REJECTION EMAIL (RESTORED) ----------
-
+# =========================
+# SEND REJECTION EMAIL
+# =========================
 def send_rejection_email(image_id: str, image_url: str):
     msg = EmailMessage()
     msg["Subject"] = "Image Rejected"

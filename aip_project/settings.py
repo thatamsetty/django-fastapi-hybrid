@@ -83,10 +83,6 @@ TEMPLATES = [
     },
 ]
 
-# =========================
-# DATABASE (NOT USED)
-# =========================
-DATABASES = {}
 
 # =========================
 # INTERNATIONALIZATION
